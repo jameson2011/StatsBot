@@ -28,18 +28,15 @@ module Program=
                                 let systemId = s.["system_id"].ToObject<int32>()                                   
                                 let system = systemId |> IronSde.SolarSystems.ofId |> Option.get
                                 let region = system |> (fun s -> s.regionId) |> IronSde.Regions.ofId |> Option.get
-                                let npcKills = s.["npc_kills"]
-                                let podKills = s.["pod_kills"]
-                                let shipKills = s.["ship_kills"]
-
+                                
                                 { SystemStats.name = system.name;
                                             level = system.level.ToString();
                                             regionName = region.name;
                                             systemId = systemId;
                                             jumps = 0;
-                                            npcKills = npcKills.ToObject<int32>();
-                                            podKills= podKills.ToObject<int32>();
-                                            shipKills = shipKills.ToObject<int32>();
+                                            npcKills = s.["npc_kills"].ToObject<int32>();
+                                            podKills= s.["pod_kills"].ToObject<int32>();
+                                            shipKills = s.["ship_kills"].ToObject<int32>();
                                             
                                     }
                             )
@@ -69,8 +66,7 @@ module Program=
         csv.WriteHeader(typeof<SystemStats>)
         csv.NextRecord()
 
-        stats |> Seq.iter (fun s -> 
-                                    csv.WriteRecord(s)
+        stats |> Seq.iter (fun s -> csv.WriteRecord(s)
                                     csv.NextRecord())
             
 
@@ -95,16 +91,15 @@ module Program=
         let t = client.SendMessageAsync(title, false, embeds)
 
         t.Wait()
-
-        ignore 0
+        
 
     [<EntryPoint>]
     let main argv = 
         try
             let id, token, output = match argv with
-                                        | [| id; token; output |] -> id, token, Some output
-                                        | [| id; token; |] -> id, token, None
-                                        |  _ -> failwith "Missing discord webhook ID & token"
+                                        | [| id; token; output |] ->    id, token, Some output
+                                        | [| id; token; |] ->           id, token, None
+                                        |  _ ->                         failwith "Missing discord webhook ID & token"
             
             let kills = getKillsJson() |> Async.RunSynchronously |> getKillsStats
             let jumpsJson = getJumpsJson() |> Async.RunSynchronously
@@ -114,8 +109,8 @@ module Program=
                         
             if output.IsSome then
                 writeCsv output.Value stats            
-            
             0
+
         with
         | ex -> System.Console.Error.WriteLine(ex.Message)
                 2
