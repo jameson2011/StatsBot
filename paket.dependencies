@@ -1,4 +1,6 @@
 source https://www.nuget.org/api/v2
 nuget CsvHelper
 nuget Discord.Net
+nuget Fake
+nuget Fake.IO.FileSystem
 nuget IronSde
