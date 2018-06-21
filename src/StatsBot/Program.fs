@@ -85,7 +85,7 @@ module Program=
                                                     eb.Build()
                                                     )
                                 |> Array.ofSeq
-        let title = System.DateTime.UtcNow.ToString() |> sprintf "Top 10 lowsec rat systems as of %s" 
+        let title = System.DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm") |> sprintf "Top 10 lowsec rat systems as of %sZ" 
         
         let client = new Discord.Webhook.DiscordWebhookClient(id, token)
         
