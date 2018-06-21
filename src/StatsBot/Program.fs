@@ -5,6 +5,7 @@ module Program=
     open System.Text
     open Discord
     
+    
     let getJson(uri: string)=
         async {
             use client = new System.Net.Http.HttpClient()
@@ -12,7 +13,7 @@ module Program=
             let! resp = client.GetAsync(uri) |> Async.AwaitTask
 
             if resp.StatusCode <> System.Net.HttpStatusCode.OK then
-                failwith "Error returned from ESI"
+                resp.StatusCode.ToString() |> sprintf "Error %s returned from ESI" |> failwith
 
             let! json = resp.Content.ReadAsStringAsync() |> Async.AwaitTask
                 
