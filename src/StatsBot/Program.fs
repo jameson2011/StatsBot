@@ -27,12 +27,17 @@ module Program=
         Newtonsoft.Json.JsonConvert.DeserializeObject(json) :?> Newtonsoft.Json.Linq.JArray
             |> Seq.map (fun s -> 
                                 let systemId = s.["system_id"].ToObject<int32>()                                   
-                                let system = systemId |> IronSde.SolarSystems.ofId |> Option.get
-                                let region = system |> (fun s -> s.regionId) |> IronSde.Regions.ofId |> Option.get
                                 
-                                { SystemStats.name = system.name;
-                                            level = system.level.ToString();
-                                            regionName = region.name;
+                                let systemName, regionName, level = match systemId |> IronSde.SolarSystems.ofId with
+                                                                    | Some s -> match s |> (fun s -> s.regionId) |> IronSde.Regions.ofId with
+                                                                                | Some r -> s.name, r.name, s.level.ToString()
+                                                                                | _ -> s.name, (sprintf "Region%i" s.regionId), s.level.ToString()
+                                                                    | _ -> (sprintf "System%i"  systemId), "Unknown", "Unknown"
+                                
+                                
+                                { SystemStats.name = systemName;
+                                            level = level;
+                                            regionName = regionName;
                                             systemId = systemId;
                                             jumps = 0;
                                             npcKills = s.["npc_kills"].ToObject<int32>();
