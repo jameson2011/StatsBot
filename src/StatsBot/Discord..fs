@@ -4,9 +4,10 @@ module Discord=
     
     open Discord
 
-    let dotlanSystemUri(systemName: string) =
-        systemName.Replace(" ", "_")
-            |> sprintf "http://evemaps.dotlan.net/map/Genesis/%s#npc24"
+    let dotlanSystemUri(regionName: string) (systemName: string) =
+        let systemName = systemName.Replace(" ", "_")
+        let regionName = regionName.Replace(" ", "_")
+        sprintf "http://evemaps.dotlan.net/map/%s/%s#npc24" regionName systemName
 
     let sendToDiscord id token (stats: SystemStats []) =
 
@@ -16,7 +17,7 @@ module Discord=
         
         let embeds = topStats |> Seq.map (fun s ->  let eb = (new Discord.EmbedBuilder())
                                                                 .WithTitle(sprintf "%s - %s (%s) " s.regionName s.name s.level )
-                                                                .WithUrl(dotlanSystemUri s.name)
+                                                                .WithUrl(dotlanSystemUri s.regionName s.name)
                                                     eb.Fields.Add((new EmbedFieldBuilder()).WithName("rats").WithValue(s.npcKills).WithIsInline(true))
                                                     eb.Fields.Add((new EmbedFieldBuilder()).WithName("ships / pods").WithValue(sprintf "%i / %i" s.shipKills s.podKills).WithIsInline(true))
                                                     eb.Fields.Add((new EmbedFieldBuilder()).WithName("jumps").WithValue(s.jumps).WithIsInline(true))
