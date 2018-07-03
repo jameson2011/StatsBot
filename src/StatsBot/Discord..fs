@@ -14,8 +14,21 @@ module Discord=
                                 |> Array.sortByDescending (fun s -> s.npcKills) 
                                 |> Array.take 10
         
+        let systemType (system: SystemStats) = 
+            match system.isIncursion, system.isFw with
+            | true, true -> "Incursion, FW"
+            | false, true -> "FW"
+            | true, false -> "Incursion"
+            | _ -> ""
+            
+        let paranthesis = function
+                            | "" -> ""
+                            | x -> sprintf "(%s)" x
+
+        let tags = systemType >> paranthesis
+
         let embeds = topStats |> Seq.map (fun s ->  let eb = (new Discord.EmbedBuilder())
-                                                                .WithTitle(sprintf "%s - %s (%s) " s.regionName s.name s.level )
+                                                                .WithTitle(sprintf "%s - %s %s" s.regionName s.name (tags s) )
                                                                 .WithUrl(dotlanSystemUri s.name)
                                                     eb.Fields.Add((new EmbedFieldBuilder()).WithName("rats").WithValue(s.npcKills).WithIsInline(true))
                                                     eb.Fields.Add((new EmbedFieldBuilder()).WithName("ships / pods").WithValue(sprintf "%i / %i" s.shipKills s.podKills).WithIsInline(true))

@@ -11,7 +11,7 @@ module Program=
                                         | [| id; token; |] ->           id, token, None
                                         |  _ ->                         failwith "Missing discord webhook ID & token"
             
-            let stats = Data.getData()
+            let stats = Data.getData() |> Async.RunSynchronously
             
             stats |> StatsBot.Discord.sendToDiscord (System.UInt64.Parse id) token
                         
