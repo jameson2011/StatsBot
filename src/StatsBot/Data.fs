@@ -103,11 +103,16 @@ module Data=
             use client = client()
             let getJson = getJson client
 
-            let! incursionSystems = getIncursionSystems getJson
-            let! fwSystems = getFwSystems getJson
-        
+            let! inc = getIncursionSystems getJson |> Async.StartChild
+            let! fw = getFwSystems getJson |> Async.StartChild
+            let! js = getJumps getJson |> Async.StartChild
+
+            let! incursionSystems = inc
+            let! fwSystems = fw
+            
             let! kills = getKills getJson incursionSystems fwSystems
-            let! jumps = getJumps getJson
-        
+            
+            let! jumps = js
+
             return joinJumps jumps kills
             }
